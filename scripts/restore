@@ -81,8 +81,13 @@ chown -R root: $final_path
 # RESTORE THE PHP-FPM CONFIGURATION
 #=================================================
 
-ynh_restore_file "/etc/php5/fpm/pool.d/$app.conf"
-ynh_restore_file "/etc/php5/fpm/conf.d/20-$app.ini"
+if [ -z /etc/php5/ ]; then
+	ynh_restore_file "/etc/php5/fpm/pool.d/$app.conf"
+	ynh_restore_file "/etc/php5/fpm/conf.d/20-$app.ini"
+else 
+	ynh_restore_file "/etc/php/7.0/fpm/pool.d/$app.conf"
+	ynh_restore_file "/etc/php/7.0/fpm/conf.d/20-$app.ini"
+fi
 
 #=================================================
 # SPECIFIC RESTORATION
@@ -123,6 +128,9 @@ ynh_restore_file "/etc/logrotate.d/$app"
 #=================================================
 # RELOAD NGINX AND PHP-FPM
 #=================================================
-
-systemctl reload php5-fpm
+if [ -z /etc/php5/ ]; then
+	systemctl reload php5-fpm
+else
+	systemctl reload php7.0-fpm
+fi
 systemctl reload nginx
